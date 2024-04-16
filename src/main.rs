@@ -22,16 +22,17 @@ use ark_ff::UniformRand;
 use ark_ec::Group;
 use rand_chacha::ChaCha20Rng;
 
+
 use ark_bls12_377::Bls12_377;
 use ark_ec::bls12::Bls12Config;
 use ark_ec::hashing::curve_maps::wb::{WBConfig, WBMap};
 use ark_ec::hashing::map_to_curve_hasher::MapToCurve;
 use ark_ec::pairing::Pairing as PairingEngine;
-use ark_serialize::CanonicalDeserialize;
+use ark_serialize::{CanonicalSerialize, CanonicalDeserialize};
 
 use rand_core::OsRng;
 
-use w3f_bls::{CurveExtraConfig, TinyBLS, UsualBLS};
+use w3f_bls::{CurveExtraConfig, TinyBLS, TinyBLS377, SerializableToBytes};
 
 use ark_std::{test_rng, rand::{RngCore, SeedableRng}};
 
@@ -66,17 +67,17 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let current_block = client.blocks().at_latest().await?;
     let current_block_number = current_block.header().number;
-    let target = current_block_number + 2;
+    let target = current_block_number + 1;
 
     println!("🧊 Current block number: #{:?}", current_block_number);
 
-    let ciphertext = tlock_encrypt::<TinyBLS<Bls12_377, ark_bls12_377::Config>, Bls12_377, ark_bls12_377::Config>(
+    let ciphertext = tlock_encrypt::<TinyBLS377>(
         client.clone(), 
         round_pubkey_bytes,
         target,
     ).await?;
 
-    if let Some(decryption_key) = wait_for_justification::<TinyBLS<Bls12_377, ark_bls12_377::Config>, Bls12_377, ark_bls12_377::Config>(
+    if let Some(decryption_key) = wait_for_justification::<TinyBLS377>(
         rpc_client, client.clone(), target
     ).await? {
         println!(
@@ -84,48 +85,60 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             decryption_key,
             target,
         );
-        let m = tlock_decrypt::<TinyBLS<Bls12_377, ark_bls12_377::Config>, Bls12_377, ark_bls12_377::Config>(
+        let m = tlock_decrypt::<TinyBLS377>(
             client.clone(),
             ciphertext, 
             decryption_key,
         ).await?;
 
-        println!("Message recovered: {:?}", m);
+        println!("🔓 Message recovered: {:?}", std::str::from_utf8(&m).unwrap());
+        println!("👋 Goodbye.");
         return Ok(());
     }
 
     Ok(())
 }
 
+/// construct the encoded commitment for the round in which block_number h
+async fn get_validator_set_id(
+    client: OnlineClient<SubstrateConfig>,
+    block_number: u32,
+) -> Result<u64, Box<dyn std::error::Error>>  {
+    // we need to estimate the future epoch index when block_number will happen
+    // for now, since we are encrypting for close by blocks, we will just use the current epoch index
+    // but this won't work for blocks in different epochs.
+
+    let epoch_index_query = subxt::dynamic::storage("Babe", "EpochIndex", ());
+    let result = client.storage()
+        .at_latest()
+        .await?
+        .fetch(&epoch_index_query)
+        .await?;
+    let epoch_index = result.unwrap().as_type::<u64>()?;
+    Ok(epoch_index)
+}
+
 /// perform timelock encryption over BLS12-377
-async fn tlock_encrypt<
-    EB: EngineBLS<Engine = E>,
-    E: PairingEngine, 
-    P: Bls12Config + CurveExtraConfig>(
+async fn tlock_encrypt<E: EngineBLS>(
         client: OnlineClient<SubstrateConfig>,
         mut rk_bytes: Vec<u8>,
         target: u32,
-    ) -> Result<TLECiphertext<EB>, Box<dyn std::error::Error>>
-where
-    <P as Bls12Config>::G2Config: WBConfig,
-    WBMap<<P as Bls12Config>::G2Config>: MapToCurve<<E as PairingEngine>::G2>,
-{
-    let round_pubkey = EB::PublicKeyGroup::deserialize_compressed(&rk_bytes[..])
+    ) -> Result<TLECiphertext<E>, Box<dyn std::error::Error>> {
+    let round_pubkey = E::PublicKeyGroup::deserialize_compressed(&rk_bytes[..])
         .expect("The network must have a valid round public key.");
 
     println!("🔑 Successfully retrieved the round public key.");
 
     println!("🔒 Encrypting the message for target block #{:?}", target);
 
+    let epoch_index = get_validator_set_id(client.clone(), target.clone()).await?;
     let payload = Payload::from_single_entry(known_payloads::ETF_SIGNATURE, Vec::new());
-    let commitment = Commitment { payload, block_number: target, validator_set_id: 6 };
-
-    println!("THE ENCODED COMMITMENT LOOKS LIKE: {:?}", commitment.clone().encode());
+    let commitment = Commitment { payload, block_number: target, validator_set_id: epoch_index };
     // validators sign the SCALE encoded commitment, so that becomes our identity for TLE as well
     let message = b"This is a test".to_vec();
     let id = Identity::new(&commitment.encode());
     // 2) tlock for encoded commitment (TODO: error handling)
-    let ciphertext = Tlock::<EB>::encrypt(
+    let ciphertext = Tlock::<E>::encrypt(
         round_pubkey,
         &message,
         vec![id],
@@ -135,45 +148,27 @@ where
     Ok(ciphertext)
 }
 
-
 /// perform timelock encryption over BLS12-377
-async fn tlock_decrypt<
-    EB: EngineBLS<Engine = E>,
-    E: PairingEngine, 
-    P: Bls12Config + CurveExtraConfig>(
+async fn tlock_decrypt<E: EngineBLS>(
         client: OnlineClient<SubstrateConfig>,
-        ciphertext: TLECiphertext<EB>,
-        signature: EB::SignatureGroup,
-    ) -> Result<Vec<u8>, Box<dyn std::error::Error>>
-where
-    <P as Bls12Config>::G2Config: WBConfig,
-    WBMap<<P as Bls12Config>::G2Config>: MapToCurve<<E as PairingEngine>::G2>,
-{    
-
-    // let ibe_secret = IBESecret(signature);
-
-    let message = Tlock::<EB>::decrypt(
+        ciphertext: TLECiphertext<E>,
+        signature: E::SignatureGroup,
+    ) -> Result<Vec<u8>, Box<dyn std::error::Error>> {    
+    let result = Tlock::<E>::decrypt(
         ciphertext,
         vec![IBESecret(signature)],
     ).unwrap();
 
-    Ok(vec![])
+    Ok(result.message)
 }
 
 /// subscribe for justifications until we can decode a finality proof
 /// given at a specific block number (in the future)
-async fn wait_for_justification<
-    EB: EngineBLS<Engine = E>,
-    E: PairingEngine, 
-    P: Bls12Config + CurveExtraConfig>(
+async fn wait_for_justification<E: EngineBLS>(
     rpc_client: RpcClient, 
     client: OnlineClient<SubstrateConfig>,
     block_number: u32,
-) -> Result<Option<EB::SignatureGroup>, Box<dyn std::error::Error>>
-where
-    <P as Bls12Config>::G2Config: WBConfig,
-    WBMap<<P as Bls12Config>::G2Config>: MapToCurve<<E as PairingEngine>::G2>,
-{
+) -> Result<Option<E::SignatureGroup>, Box<dyn std::error::Error>> {
 
     println!("🔍 Subscribing to ETF justifications...");
 
@@ -193,18 +188,17 @@ where
                 VersionedFinalityProof::V1(signed_commitment) => {
                     let sigs = signed_commitment.signatures;
                     let primary = sigs[0].unwrap();
-                    let sig = sp_core::bls377::Signature::from(primary);
-                    let sig_bytes = sig.0;
-                    let s = EB::SignatureGroup::deserialize_compressed(&mut &sig_bytes[..]).unwrap();
-                    return Ok(Some(s))
-                    // println!(
-                    //     "🧾 Extracted signatures {:?} for block number #{:?}", 
-                    //     sig,
-                    //     current_block_number,
-                    // );
+                    match w3f_bls::double::DoubleSignature::<E>::from_bytes(&primary.to_raw().to_vec()) {
+                        Ok(sig) => {
+                            return Ok(Some(sig.0))
+                        },
+                        Err(_) => {
+                            panic!("did not work");
+                        },
+                    };
                 }
                 _ => {
-                    println!("idk");
+                    println!("handle the error properly later on - corrupted finality proof");
                 }
             }
             
