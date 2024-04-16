@@ -4,9 +4,13 @@ A simple client to watch ETF-PFG finality proofs and perform timelock encryption
 
 ## Setup
 
+First run a local ETF node. Once it is running and producing ETF blocks, generate metadata by running `./generate_metadata.sh` from the root directory. Finally, run
+
 ``` shell
 cargo run
 ```
+
+This will encrypt a message "this is a test" for the next upcoming block. It listens to justifications, extracts signatures, and then uses those to try to decrypt the message.
 
 ## Testing
 

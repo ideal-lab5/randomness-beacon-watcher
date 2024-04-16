@@ -1,15 +1,27 @@
+
+/*
+ * Copyright 2024 by Ideal Labs, LLC
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 #![allow(missing_docs)]
 
 use subxt::{
     client::OnlineClient,
     config::SubstrateConfig,
-    dynamic::At,
     backend::rpc::{RpcClient, RpcParams},
 };
 use subxt::ext::codec::Encode;
-use subxt_signer::sr25519::dev;
-
-use w3f_bls::EngineBLS;
 use beefy::{known_payloads, Payload, Commitment, VersionedFinalityProof};
 use sp_core::{Bytes, Decode};
 
@@ -18,23 +30,12 @@ use etf_crypto_primitives::{
     encryption::tlock::{Tlock, TLECiphertext}
 };
 
-use ark_ff::UniformRand;
-use ark_ec::Group;
-use rand_chacha::ChaCha20Rng;
-
-
-use ark_bls12_377::Bls12_377;
-use ark_ec::bls12::Bls12Config;
-use ark_ec::hashing::curve_maps::wb::{WBConfig, WBMap};
-use ark_ec::hashing::map_to_curve_hasher::MapToCurve;
-use ark_ec::pairing::Pairing as PairingEngine;
-use ark_serialize::{CanonicalSerialize, CanonicalDeserialize};
+use ark_serialize::CanonicalDeserialize;
 
 use rand_core::OsRng;
 
-use w3f_bls::{CurveExtraConfig, TinyBLS, TinyBLS377, SerializableToBytes};
+use w3f_bls::{EngineBLS, TinyBLS377, SerializableToBytes};
 
-use ark_std::{test_rng, rand::{RngCore, SeedableRng}};
 
 pub enum ETFError {
     EncryptionFailed,
@@ -102,7 +103,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 /// construct the encoded commitment for the round in which block_number h
 async fn get_validator_set_id(
     client: OnlineClient<SubstrateConfig>,
-    block_number: u32,
+    _block_number: u32,
 ) -> Result<u64, Box<dyn std::error::Error>>  {
     // we need to estimate the future epoch index when block_number will happen
     // for now, since we are encrypting for close by blocks, we will just use the current epoch index
@@ -121,7 +122,7 @@ async fn get_validator_set_id(
 /// perform timelock encryption over BLS12-377
 async fn tlock_encrypt<E: EngineBLS>(
         client: OnlineClient<SubstrateConfig>,
-        mut rk_bytes: Vec<u8>,
+        rk_bytes: Vec<u8>,
         target: u32,
     ) -> Result<TLECiphertext<E>, Box<dyn std::error::Error>> {
     let round_pubkey = E::PublicKeyGroup::deserialize_compressed(&rk_bytes[..])
@@ -131,7 +132,7 @@ async fn tlock_encrypt<E: EngineBLS>(
 
     println!("🔒 Encrypting the message for target block #{:?}", target);
 
-    let epoch_index = get_validator_set_id(client.clone(), target.clone()).await?;
+    let epoch_index = get_validator_set_id(client.clone(), target).await?;
     let payload = Payload::from_single_entry(known_payloads::ETF_SIGNATURE, Vec::new());
     let commitment = Commitment { payload, block_number: target, validator_set_id: epoch_index };
     // validators sign the SCALE encoded commitment, so that becomes our identity for TLE as well
@@ -143,14 +144,14 @@ async fn tlock_encrypt<E: EngineBLS>(
         &message,
         vec![id],
         1,
-        &mut OsRng,
+        OsRng,
     ).unwrap();
     Ok(ciphertext)
 }
 
 /// perform timelock encryption over BLS12-377
 async fn tlock_decrypt<E: EngineBLS>(
-        client: OnlineClient<SubstrateConfig>,
+        _client: OnlineClient<SubstrateConfig>,
         ciphertext: TLECiphertext<E>,
         signature: E::SignatureGroup,
     ) -> Result<Vec<u8>, Box<dyn std::error::Error>> {    
@@ -188,17 +189,14 @@ async fn wait_for_justification<E: EngineBLS>(
                 VersionedFinalityProof::V1(signed_commitment) => {
                     let sigs = signed_commitment.signatures;
                     let primary = sigs[0].unwrap();
-                    match w3f_bls::double::DoubleSignature::<E>::from_bytes(&primary.to_raw().to_vec()) {
+                    match w3f_bls::double::DoubleSignature::<E>::from_bytes(&primary.to_raw()) {
                         Ok(sig) => {
                             return Ok(Some(sig.0))
                         },
                         Err(_) => {
-                            panic!("did not work");
+                            panic!("TODO: proper error handling: couldn't recover sig");
                         },
                     };
-                }
-                _ => {
-                    println!("handle the error properly later on - corrupted finality proof");
                 }
             }
             
