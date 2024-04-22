@@ -16,16 +16,14 @@ blake2b-rs = "0.2.0"
 bytes = "1.4.0"
 serde_json = "1.0.108"
 indicatif = "0.17.8"
-# beefy = { package = "sp-consensus-beefy", git = "https://github.com/ideal-lab5/polkadot-sdk.git", branch = "etf", features = ["bls-experimental"] } 
-# sp-core = { git = "https://github.com/ideal-lab5/polkadot-sdk.git", branch = "etf", features = ["bls-experimental"]}
-# beefy = { package = "sp-consensus-beefy", git = "https://github.com/ideal-lab5/polkadot-sdk.git", branch = "etf", features = ["bls-experimental"] } 
-# sp-application-crypto = { git = "https://github.com/ideal-lab5/polkadot-sdk.git", branch = "etf", features = ["bls-experimental"] }
-# sp-core = { git = "https://github.com/ideal-lab5/polkadot-sdk.git", branch = "etf", features = ["bls-experimental"] }
-# sp-runtime = { git = "https://github.com/ideal-lab5/polkadot-sdk.git", branch = "etf" }
-beefy = { package = "sp-consensus-beefy", path = "../polkadot-sdk/substrate/primitives/consensus/beefy", features = ["bls-experimental"] } 
-sp-application-crypto = { path = "../polkadot-sdk/substrate/primitives/application-crypto", features = ["bls-experimental"] }
-sp-core = { path = "../polkadot-sdk/substrate/primitives/core", features = ["bls-experimental"] }
-sp-runtime = { path = "../polkadot-sdk/substrate/primitives/runtime" }
+beefy = { package = "sp-consensus-beefy", git = "https://github.com/ideal-lab5/polkadot-sdk.git", branch = "etf", features = ["bls-experimental"] } 
+sp-core = { git = "https://github.com/ideal-lab5/polkadot-sdk.git", branch = "etf", features = ["bls-experimental"]}
+sp-application-crypto = { git = "https://github.com/ideal-lab5/polkadot-sdk.git", branch = "etf", features = ["bls-experimental"] }
+sp-runtime = { git = "https://github.com/ideal-lab5/polkadot-sdk.git", branch = "etf" }
+# beefy = { package = "sp-consensus-beefy", path = "../polkadot-sdk/substrate/primitives/consensus/beefy", features = ["bls-experimental"] } 
+# sp-application-crypto = { path = "../polkadot-sdk/substrate/primitives/application-crypto", features = ["bls-experimental"] }
+# sp-core = { path = "../polkadot-sdk/substrate/primitives/core", features = ["bls-experimental"] }
+# sp-runtime = { path = "../polkadot-sdk/substrate/primitives/runtime" }
 ark-bls12-377 = "0.4.0"
 ark-std = "0.4.0"
 ark-ec = "0.4.0"
