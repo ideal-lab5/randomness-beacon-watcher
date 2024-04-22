@@ -1,16 +1,14 @@
 [package]
 name = "randomness-beacon-watcher"
+description = "A demo to listen to justficiation and run tlock"
 version = "0.1.0"
 edition = "2021"
-
-# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
 subxt = "0.35.2"
 subxt-signer = "0.35.2"
 tokio = { version = "1.35", features = ["macros", "time", "rt-multi-thread"] }
-# etf-crypto-primitives = { git = "https://github.com/ideal-lab5/etf-sdk/", branch = "main" } 
-etf-crypto-primitives = { path = "../etf-sdk/etf-crypto-primitives" } 
+etf-crypto-primitives = { git = "https://github.com/ideal-lab5/etf-sdk/", branch = "w3fbls-migration" }
 clap = { version = "4.1.1", features = ["derive"] }
 rand_chacha = "0.3.1"
 ckb-merkle-mountain-range = "0.5.2"
@@ -20,6 +18,10 @@ serde_json = "1.0.108"
 indicatif = "0.17.8"
 # beefy = { package = "sp-consensus-beefy", git = "https://github.com/ideal-lab5/polkadot-sdk.git", branch = "etf", features = ["bls-experimental"] } 
 # sp-core = { git = "https://github.com/ideal-lab5/polkadot-sdk.git", branch = "etf", features = ["bls-experimental"]}
+# beefy = { package = "sp-consensus-beefy", git = "https://github.com/ideal-lab5/polkadot-sdk.git", branch = "etf", features = ["bls-experimental"] } 
+# sp-application-crypto = { git = "https://github.com/ideal-lab5/polkadot-sdk.git", branch = "etf", features = ["bls-experimental"] }
+# sp-core = { git = "https://github.com/ideal-lab5/polkadot-sdk.git", branch = "etf", features = ["bls-experimental"] }
+# sp-runtime = { git = "https://github.com/ideal-lab5/polkadot-sdk.git", branch = "etf" }
 beefy = { package = "sp-consensus-beefy", path = "../polkadot-sdk/substrate/primitives/consensus/beefy", features = ["bls-experimental"] } 
 sp-application-crypto = { path = "../polkadot-sdk/substrate/primitives/application-crypto", features = ["bls-experimental"] }
 sp-core = { path = "../polkadot-sdk/substrate/primitives/core", features = ["bls-experimental"] }

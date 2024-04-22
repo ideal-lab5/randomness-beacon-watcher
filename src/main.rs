@@ -27,11 +27,11 @@ use sp_core::{Bytes, Decode};
 
 use etf_crypto_primitives::{
     ibe::fullident::{IBESecret, Identity},
-    encryption::tlock::{Tlock, TLECiphertext}
+    encryption::tlock::{TLECiphertext, SecretKey}
 };
 
 use ark_serialize::CanonicalDeserialize;
-
+use ark_ff::UniformRand;
 use rand_core::OsRng;
 
 use w3f_bls::{EngineBLS, TinyBLS377, SerializableToBytes};
@@ -87,9 +87,8 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
             target,
         );
         let m = tlock_decrypt::<TinyBLS377>(
-            client.clone(),
             ciphertext, 
-            decryption_key,
+            vec![IBESecret(decryption_key)],
         ).await?;
 
         println!("🔓 Message recovered: {:?}", std::str::from_utf8(&m).unwrap());
@@ -103,19 +102,16 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 /// construct the encoded commitment for the round in which block_number h
 async fn get_validator_set_id(
     client: OnlineClient<SubstrateConfig>,
-    _block_number: u32,
+    block_number: u32,
 ) -> Result<u64, Box<dyn std::error::Error>>  {
-    // we need to estimate the future epoch index when block_number will happen
-    // for now, since we are encrypting for close by blocks, we will just use the current epoch index
-    // but this won't work for blocks in different epochs.
-
-    let epoch_index_query = subxt::dynamic::storage("Babe", "EpochIndex", ());
+    let epoch_index_query = subxt::dynamic::storage("Beefy", "ValidatorSetId", ());
     let result = client.storage()
         .at_latest()
         .await?
         .fetch(&epoch_index_query)
         .await?;
     let epoch_index = result.unwrap().as_type::<u64>()?;
+    
     Ok(epoch_index)
 }
 
@@ -125,25 +121,25 @@ async fn tlock_encrypt<E: EngineBLS>(
         rk_bytes: Vec<u8>,
         target: u32,
     ) -> Result<TLECiphertext<E>, Box<dyn std::error::Error>> {
+
     let round_pubkey = E::PublicKeyGroup::deserialize_compressed(&rk_bytes[..])
         .expect("The network must have a valid round public key.");
 
     println!("🔑 Successfully retrieved the round public key.");
 
     println!("🔒 Encrypting the message for target block #{:?}", target);
-
+    let msk = SecretKey(E::Scalar::rand(&mut OsRng));
     let epoch_index = get_validator_set_id(client.clone(), target).await?;
     let payload = Payload::from_single_entry(known_payloads::ETF_SIGNATURE, Vec::new());
     let commitment = Commitment { payload, block_number: target, validator_set_id: epoch_index };
     // validators sign the SCALE encoded commitment, so that becomes our identity for TLE as well
-    let message = b"This is a test".to_vec();
+    let message = b"This is a test message - change me".to_vec();
     let id = Identity::new(&commitment.encode());
     // 2) tlock for encoded commitment (TODO: error handling)
-    let ciphertext = Tlock::<E>::encrypt(
+    let ciphertext = msk.encrypt(
         round_pubkey,
         &message,
-        vec![id],
-        1,
+        id,
         OsRng,
     ).unwrap();
     Ok(ciphertext)
@@ -151,15 +147,10 @@ async fn tlock_encrypt<E: EngineBLS>(
 
 /// perform timelock encryption over BLS12-377
 async fn tlock_decrypt<E: EngineBLS>(
-        _client: OnlineClient<SubstrateConfig>,
         ciphertext: TLECiphertext<E>,
-        signature: E::SignatureGroup,
-    ) -> Result<Vec<u8>, Box<dyn std::error::Error>> {    
-    let result = Tlock::<E>::decrypt(
-        ciphertext,
-        vec![IBESecret(signature)],
-    ).unwrap();
-
+        signatures: Vec<IBESecret<E>>,
+    ) -> Result<Vec<u8>, Box<dyn std::error::Error>> {
+    let result = ciphertext.decrypt(signatures).unwrap();
     Ok(result.message)
 }
 
@@ -203,4 +194,5 @@ async fn wait_for_justification<E: EngineBLS>(
         }
     }
     Ok(None)
+
 }
