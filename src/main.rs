@@ -1,4 +1,3 @@
-
 /*
  * Copyright 2024 by Ideal Labs, LLC
  *
@@ -42,12 +41,26 @@ pub enum ETFError {
     Other,
 }
 
+use clap::{Parser, Subcommand};
+
+#[derive(Parser)]
+#[command(version)]
+struct Cli {
+    /// the message to timelock
+    message: String,
+    /// the length of bocks to wait
+    delay: u32,
+}
+
 // Generate an interface that we can use from the node's metadata.
 #[subxt::subxt(runtime_metadata_path = "./artifacts/metadata.scale")]
 pub mod etf {}
 
 #[tokio::main]
 async fn main() -> Result<(), Box<dyn std::error::Error>> {
+
+    let cli = Cli::parse();
+
     println!("🎲 ETF Randomness Beacon and Timelock Encryption Demo");
 
     let rpc_client = RpcClient::from_url("ws://localhost:9944").await?;
@@ -68,14 +81,16 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let current_block = client.blocks().at_latest().await?;
     let current_block_number = current_block.header().number;
-    let target = current_block_number + 1;
+    let target = current_block_number + cli.delay;
 
     println!("🧊 Current block number: #{:?}", current_block_number);
 
     let ciphertext = tlock_encrypt::<TinyBLS377>(
         client.clone(), 
         round_pubkey_bytes,
+        cli.message.as_bytes().to_vec(),
         target,
+        // b"This is a test message - change me".to_vec();
     ).await?;
 
     if let Some(decryption_key) = wait_for_justification::<TinyBLS377>(
@@ -119,6 +134,7 @@ async fn get_validator_set_id(
 async fn tlock_encrypt<E: EngineBLS>(
         client: OnlineClient<SubstrateConfig>,
         rk_bytes: Vec<u8>,
+        message: Vec<u8>,
         target: u32,
     ) -> Result<TLECiphertext<E>, Box<dyn std::error::Error>> {
 
@@ -133,7 +149,6 @@ async fn tlock_encrypt<E: EngineBLS>(
     let payload = Payload::from_single_entry(known_payloads::ETF_SIGNATURE, Vec::new());
     let commitment = Commitment { payload, block_number: target, validator_set_id: epoch_index };
     // validators sign the SCALE encoded commitment, so that becomes our identity for TLE as well
-    let message = b"This is a test message - change me".to_vec();
     let id = Identity::new(&commitment.encode());
     // 2) tlock for encoded commitment (TODO: error handling)
     let ciphertext = msk.encrypt(

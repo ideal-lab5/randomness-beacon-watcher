@@ -4155,6 +4155,7 @@ dependencies = [
 [[package]]
 name = "sp-api"
 version = "26.0.0"
+source = "git+https://github.com/ideal-lab5/polkadot-sdk.git?branch=etf#06c9e853e42b2a8776dfe62893171acdc166df0b"
 dependencies = [
  "hash-db",
  "log",
@@ -4162,12 +4163,12 @@ dependencies = [
  "scale-info",
  "sp-api-proc-macro",
  "sp-core",
- "sp-externalities 0.25.0",
+ "sp-externalities 0.25.0 (git+https://github.com/ideal-lab5/polkadot-sdk.git?branch=etf)",
  "sp-metadata-ir",
  "sp-runtime",
- "sp-runtime-interface 24.0.0",
+ "sp-runtime-interface 24.0.0 (git+https://github.com/ideal-lab5/polkadot-sdk.git?branch=etf)",
  "sp-state-machine",
- "sp-std 14.0.0",
+ "sp-std 14.0.0 (git+https://github.com/ideal-lab5/polkadot-sdk.git?branch=etf)",
  "sp-trie",
  "sp-version",
  "thiserror",
@@ -4176,6 +4177,7 @@ dependencies = [
 [[package]]
 name = "sp-api-proc-macro"
 version = "15.0.0"
+source = "git+https://github.com/ideal-lab5/polkadot-sdk.git?branch=etf#06c9e853e42b2a8776dfe62893171acdc166df0b"
 dependencies = [
  "Inflector",
  "blake2",
@@ -4189,18 +4191,20 @@ dependencies = [
 [[package]]
 name = "sp-application-crypto"
 version = "30.0.0"
+source = "git+https://github.com/ideal-lab5/polkadot-sdk.git?branch=etf#06c9e853e42b2a8776dfe62893171acdc166df0b"
 dependencies = [
  "parity-scale-codec",
  "scale-info",
  "serde",
  "sp-core",
  "sp-io",
- "sp-std 14.0.0",
+ "sp-std 14.0.0 (git+https://github.com/ideal-lab5/polkadot-sdk.git?branch=etf)",
 ]
 
 [[package]]
 name = "sp-arithmetic"
 version = "23.0.0"
+source = "git+https://github.com/ideal-lab5/polkadot-sdk.git?branch=etf#06c9e853e42b2a8776dfe62893171acdc166df0b"
 dependencies = [
  "docify",
  "integer-sqrt",
@@ -4208,7 +4212,7 @@ dependencies = [
  "parity-scale-codec",
  "scale-info",
  "serde",
- "sp-std 14.0.0",
+ "sp-std 14.0.0 (git+https://github.com/ideal-lab5/polkadot-sdk.git?branch=etf)",
  "static_assertions",
 ]
 
@@ -4233,6 +4237,7 @@ dependencies = [
 [[package]]
 name = "sp-consensus-beefy"
 version = "13.0.0"
+source = "git+https://github.com/ideal-lab5/polkadot-sdk.git?branch=etf#06c9e853e42b2a8776dfe62893171acdc166df0b"
 dependencies = [
  "lazy_static",
  "parity-scale-codec",
@@ -4252,6 +4257,7 @@ dependencies = [
 [[package]]
 name = "sp-core"
 version = "28.0.0"
+source = "git+https://github.com/ideal-lab5/polkadot-sdk.git?branch=etf#06c9e853e42b2a8776dfe62893171acdc166df0b"
 dependencies = [
  "ark-serialize",
  "array-bytes",
@@ -4284,11 +4290,11 @@ dependencies = [
  "secrecy",
  "serde",
  "sp-crypto-hashing 0.0.0",
- "sp-debug-derive 14.0.0",
- "sp-externalities 0.25.0",
- "sp-runtime-interface 24.0.0",
- "sp-std 14.0.0",
- "sp-storage 19.0.0",
+ "sp-debug-derive 14.0.0 (git+https://github.com/ideal-lab5/polkadot-sdk.git?branch=etf)",
+ "sp-externalities 0.25.0 (git+https://github.com/ideal-lab5/polkadot-sdk.git?branch=etf)",
+ "sp-runtime-interface 24.0.0 (git+https://github.com/ideal-lab5/polkadot-sdk.git?branch=etf)",
+ "sp-std 14.0.0 (git+https://github.com/ideal-lab5/polkadot-sdk.git?branch=etf)",
+ "sp-storage 19.0.0 (git+https://github.com/ideal-lab5/polkadot-sdk.git?branch=etf)",
  "ss58-registry",
  "substrate-bip39",
  "thiserror",
@@ -4320,6 +4326,7 @@ dependencies = [
 [[package]]
 name = "sp-crypto-hashing"
 version = "0.0.0"
+source = "git+https://github.com/ideal-lab5/polkadot-sdk.git?branch=etf#06c9e853e42b2a8776dfe62893171acdc166df0b"
 dependencies = [
  "blake2b_simd",
  "byteorder",
@@ -4346,6 +4353,7 @@ dependencies = [
 [[package]]
 name = "sp-crypto-hashing-proc-macro"
 version = "0.0.0"
+source = "git+https://github.com/ideal-lab5/polkadot-sdk.git?branch=etf#06c9e853e42b2a8776dfe62893171acdc166df0b"
 dependencies = [
  "quote",
  "sp-crypto-hashing 0.0.0",
@@ -4355,6 +4363,7 @@ dependencies = [
 [[package]]
 name = "sp-debug-derive"
 version = "14.0.0"
+source = "git+https://github.com/ideal-lab5/polkadot-sdk.git?branch=etf#06c9e853e42b2a8776dfe62893171acdc166df0b"
 dependencies = [
  "proc-macro2",
  "quote",
@@ -4374,10 +4383,11 @@ dependencies = [
 [[package]]
 name = "sp-externalities"
 version = "0.25.0"
+source = "git+https://github.com/ideal-lab5/polkadot-sdk.git?branch=etf#06c9e853e42b2a8776dfe62893171acdc166df0b"
 dependencies = [
  "environmental",
  "parity-scale-codec",
- "sp-storage 19.0.0",
+ "sp-storage 19.0.0 (git+https://github.com/ideal-lab5/polkadot-sdk.git?branch=etf)",
 ]
 
 [[package]]
@@ -4393,6 +4403,7 @@ dependencies = [
 [[package]]
 name = "sp-io"
 version = "30.0.0"
+source = "git+https://github.com/ideal-lab5/polkadot-sdk.git?branch=etf#06c9e853e42b2a8776dfe62893171acdc166df0b"
 dependencies = [
  "bytes",
  "ed25519-dalek",
@@ -4404,12 +4415,12 @@ dependencies = [
  "secp256k1",
  "sp-core",
  "sp-crypto-hashing 0.0.0",
- "sp-externalities 0.25.0",
+ "sp-externalities 0.25.0 (git+https://github.com/ideal-lab5/polkadot-sdk.git?branch=etf)",
  "sp-keystore",
- "sp-runtime-interface 24.0.0",
+ "sp-runtime-interface 24.0.0 (git+https://github.com/ideal-lab5/polkadot-sdk.git?branch=etf)",
  "sp-state-machine",
- "sp-std 14.0.0",
- "sp-tracing 16.0.0",
+ "sp-std 14.0.0 (git+https://github.com/ideal-lab5/polkadot-sdk.git?branch=etf)",
+ "sp-tracing 16.0.0 (git+https://github.com/ideal-lab5/polkadot-sdk.git?branch=etf)",
  "sp-trie",
  "tracing",
  "tracing-core",
@@ -4418,16 +4429,18 @@ dependencies = [
 [[package]]
 name = "sp-keystore"
 version = "0.34.0"
+source = "git+https://github.com/ideal-lab5/polkadot-sdk.git?branch=etf#06c9e853e42b2a8776dfe62893171acdc166df0b"
 dependencies = [
  "parity-scale-codec",
  "parking_lot",
  "sp-core",
- "sp-externalities 0.25.0",
+ "sp-externalities 0.25.0 (git+https://github.com/ideal-lab5/polkadot-sdk.git?branch=etf)",
 ]
 
 [[package]]
 name = "sp-metadata-ir"
 version = "0.6.0"
+source = "git+https://github.com/ideal-lab5/polkadot-sdk.git?branch=etf#06c9e853e42b2a8776dfe62893171acdc166df0b"
 dependencies = [
  "frame-metadata 16.0.0",
  "parity-scale-codec",
@@ -4437,6 +4450,7 @@ dependencies = [
 [[package]]
 name = "sp-mmr-primitives"
 version = "26.0.0"
+source = "git+https://github.com/ideal-lab5/polkadot-sdk.git?branch=etf#06c9e853e42b2a8776dfe62893171acdc166df0b"
 dependencies = [
  "ckb-merkle-mountain-range",
  "log",
@@ -4445,7 +4459,7 @@ dependencies = [
  "serde",
  "sp-api",
  "sp-core",
- "sp-debug-derive 14.0.0",
+ "sp-debug-derive 14.0.0 (git+https://github.com/ideal-lab5/polkadot-sdk.git?branch=etf)",
  "sp-runtime",
  "thiserror",
 ]
@@ -4453,6 +4467,7 @@ dependencies = [
 [[package]]
 name = "sp-panic-handler"
 version = "13.0.0"
+source = "git+https://github.com/ideal-lab5/polkadot-sdk.git?branch=etf#06c9e853e42b2a8776dfe62893171acdc166df0b"
 dependencies = [
  "backtrace",
  "lazy_static",
@@ -4462,6 +4477,7 @@ dependencies = [
 [[package]]
 name = "sp-runtime"
 version = "31.0.1"
+source = "git+https://github.com/ideal-lab5/polkadot-sdk.git?branch=etf#06c9e853e42b2a8776dfe62893171acdc166df0b"
 dependencies = [
  "docify",
  "either",
@@ -4478,25 +4494,26 @@ dependencies = [
  "sp-arithmetic",
  "sp-core",
  "sp-io",
- "sp-std 14.0.0",
+ "sp-std 14.0.0 (git+https://github.com/ideal-lab5/polkadot-sdk.git?branch=etf)",
  "sp-weights",
 ]
 
 [[package]]
 name = "sp-runtime-interface"
 version = "24.0.0"
+source = "git+https://github.com/ideal-lab5/polkadot-sdk.git?branch=etf#06c9e853e42b2a8776dfe62893171acdc166df0b"
 dependencies = [
  "bytes",
  "impl-trait-for-tuples",
  "parity-scale-codec",
  "polkavm-derive",
  "primitive-types",
- "sp-externalities 0.25.0",
- "sp-runtime-interface-proc-macro 17.0.0",
- "sp-std 14.0.0",
- "sp-storage 19.0.0",
- "sp-tracing 16.0.0",
- "sp-wasm-interface 20.0.0",
+ "sp-externalities 0.25.0 (git+https://github.com/ideal-lab5/polkadot-sdk.git?branch=etf)",
+ "sp-runtime-interface-proc-macro 17.0.0 (git+https://github.com/ideal-lab5/polkadot-sdk.git?branch=etf)",
+ "sp-std 14.0.0 (git+https://github.com/ideal-lab5/polkadot-sdk.git?branch=etf)",
+ "sp-storage 19.0.0 (git+https://github.com/ideal-lab5/polkadot-sdk.git?branch=etf)",
+ "sp-tracing 16.0.0 (git+https://github.com/ideal-lab5/polkadot-sdk.git?branch=etf)",
+ "sp-wasm-interface 20.0.0 (git+https://github.com/ideal-lab5/polkadot-sdk.git?branch=etf)",
  "static_assertions",
 ]
 
@@ -4522,6 +4539,7 @@ dependencies = [
 [[package]]
 name = "sp-runtime-interface-proc-macro"
 version = "17.0.0"
+source = "git+https://github.com/ideal-lab5/polkadot-sdk.git?branch=etf#06c9e853e42b2a8776dfe62893171acdc166df0b"
 dependencies = [
  "Inflector",
  "expander",
@@ -4547,6 +4565,7 @@ dependencies = [
 [[package]]
 name = "sp-state-machine"
 version = "0.35.0"
+source = "git+https://github.com/ideal-lab5/polkadot-sdk.git?branch=etf#06c9e853e42b2a8776dfe62893171acdc166df0b"
 dependencies = [
  "hash-db",
  "log",
@@ -4555,7 +4574,7 @@ dependencies = [
  "rand",
  "smallvec",
  "sp-core",
- "sp-externalities 0.25.0",
+ "sp-externalities 0.25.0 (git+https://github.com/ideal-lab5/polkadot-sdk.git?branch=etf)",
  "sp-panic-handler",
  "sp-trie",
  "thiserror",
@@ -4566,6 +4585,7 @@ dependencies = [
 [[package]]
 name = "sp-std"
 version = "14.0.0"
+source = "git+https://github.com/ideal-lab5/polkadot-sdk.git?branch=etf#06c9e853e42b2a8776dfe62893171acdc166df0b"
 
 [[package]]
 name = "sp-std"
@@ -4575,12 +4595,13 @@ source = "git+https://github.com/paritytech/polkadot-sdk#3380e21cd92690c2066f686
 [[package]]
 name = "sp-storage"
 version = "19.0.0"
+source = "git+https://github.com/ideal-lab5/polkadot-sdk.git?branch=etf#06c9e853e42b2a8776dfe62893171acdc166df0b"
 dependencies = [
  "impl-serde",
  "parity-scale-codec",
  "ref-cast",
  "serde",
- "sp-debug-derive 14.0.0",
+ "sp-debug-derive 14.0.0 (git+https://github.com/ideal-lab5/polkadot-sdk.git?branch=etf)",
 ]
 
 [[package]]
@@ -4598,6 +4619,7 @@ dependencies = [
 [[package]]
 name = "sp-tracing"
 version = "16.0.0"
+source = "git+https://github.com/ideal-lab5/polkadot-sdk.git?branch=etf#06c9e853e42b2a8776dfe62893171acdc166df0b"
 dependencies = [
  "parity-scale-codec",
  "tracing",
@@ -4619,6 +4641,7 @@ dependencies = [
 [[package]]
 name = "sp-trie"
 version = "29.0.0"
+source = "git+https://github.com/ideal-lab5/polkadot-sdk.git?branch=etf#06c9e853e42b2a8776dfe62893171acdc166df0b"
 dependencies = [
  "ahash 0.8.11",
  "hash-db",
@@ -4631,7 +4654,7 @@ dependencies = [
  "scale-info",
  "schnellru",
  "sp-core",
- "sp-externalities 0.25.0",
+ "sp-externalities 0.25.0 (git+https://github.com/ideal-lab5/polkadot-sdk.git?branch=etf)",
  "thiserror",
  "tracing",
  "trie-db",
@@ -4641,6 +4664,7 @@ dependencies = [
 [[package]]
 name = "sp-version"
 version = "29.0.0"
+source = "git+https://github.com/ideal-lab5/polkadot-sdk.git?branch=etf#06c9e853e42b2a8776dfe62893171acdc166df0b"
 dependencies = [
  "impl-serde",
  "parity-scale-codec",
@@ -4649,7 +4673,7 @@ dependencies = [
  "serde",
  "sp-crypto-hashing-proc-macro",
  "sp-runtime",
- "sp-std 14.0.0",
+ "sp-std 14.0.0 (git+https://github.com/ideal-lab5/polkadot-sdk.git?branch=etf)",
  "sp-version-proc-macro",
  "thiserror",
 ]
@@ -4657,6 +4681,7 @@ dependencies = [
 [[package]]
 name = "sp-version-proc-macro"
 version = "13.0.0"
+source = "git+https://github.com/ideal-lab5/polkadot-sdk.git?branch=etf#06c9e853e42b2a8776dfe62893171acdc166df0b"
 dependencies = [
  "parity-scale-codec",
  "proc-macro2",
@@ -4667,6 +4692,7 @@ dependencies = [
 [[package]]
 name = "sp-wasm-interface"
 version = "20.0.0"
+source = "git+https://github.com/ideal-lab5/polkadot-sdk.git?branch=etf#06c9e853e42b2a8776dfe62893171acdc166df0b"
 dependencies = [
  "anyhow",
  "impl-trait-for-tuples",
@@ -4688,6 +4714,7 @@ dependencies = [
 [[package]]
 name = "sp-weights"
 version = "27.0.0"
+source = "git+https://github.com/ideal-lab5/polkadot-sdk.git?branch=etf#06c9e853e42b2a8776dfe62893171acdc166df0b"
 dependencies = [
  "bounded-collections",
  "parity-scale-codec",
@@ -4695,7 +4722,7 @@ dependencies = [
  "serde",
  "smallvec",
  "sp-arithmetic",
- "sp-debug-derive 14.0.0",
+ "sp-debug-derive 14.0.0 (git+https://github.com/ideal-lab5/polkadot-sdk.git?branch=etf)",
 ]
 
 [[package]]
@@ -4778,6 +4805,7 @@ dependencies = [
 [[package]]
 name = "substrate-bip39"
 version = "0.4.7"
+source = "git+https://github.com/ideal-lab5/polkadot-sdk.git?branch=etf#06c9e853e42b2a8776dfe62893171acdc166df0b"
 dependencies = [
  "hmac 0.12.1",
  "pbkdf2",
