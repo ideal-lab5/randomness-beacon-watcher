@@ -41,7 +41,7 @@ pub enum ETFError {
     Other,
 }
 
-use clap::{Parser, Subcommand};
+use clap::Parser;
 
 #[derive(Parser)]
 #[command(version)]
@@ -70,7 +70,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
     let client = OnlineClient::<SubstrateConfig>::from_rpc_client(rpc_client.clone()).await?;
 
     // fetch the round public key from BEEFY runtime storage
-    let round_key_query = subxt::dynamic::storage("Beefy", "RoundPublic", ());
+    let round_key_query = subxt::dynamic::storage("Etf", "RoundPublic", ());
     let result = client
         .storage()
         .at_latest()
@@ -87,7 +87,7 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let ciphertext = tlock_encrypt::<TinyBLS377>(
         client.clone(), 
-        round_pubkey_bytes,
+        round_pubkey_bytes[48..].to_vec(),
         cli.message.as_bytes().to_vec(),
         target,
         // b"This is a test message - change me".to_vec();
@@ -117,7 +117,6 @@ async fn main() -> Result<(), Box<dyn std::error::Error>> {
 /// construct the encoded commitment for the round in which block_number h
 async fn get_validator_set_id(
     client: OnlineClient<SubstrateConfig>,
-    block_number: u32,
 ) -> Result<u64, Box<dyn std::error::Error>>  {
     let epoch_index_query = subxt::dynamic::storage("Beefy", "ValidatorSetId", ());
     let result = client.storage()
@@ -145,7 +144,7 @@ async fn tlock_encrypt<E: EngineBLS>(
 
     println!("🔒 Encrypting the message for target block #{:?}", target);
     let msk = SecretKey(E::Scalar::rand(&mut OsRng));
-    let epoch_index = get_validator_set_id(client.clone(), target).await?;
+    let epoch_index = get_validator_set_id(client.clone()).await?;
     let payload = Payload::from_single_entry(known_payloads::ETF_SIGNATURE, Vec::new());
     let commitment = Commitment { payload, block_number: target, validator_set_id: epoch_index };
     // validators sign the SCALE encoded commitment, so that becomes our identity for TLE as well
